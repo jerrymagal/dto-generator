@@ -69,7 +69,7 @@ public abstract class ReflectUtil {
 		}
 	}
 	
-	private static Field getFieldDTO(Object obj, String property) {
+	private static Field getFieldDTO(Object obj, String property){
 
 		for (Field field : obj.getClass().getDeclaredFields()) {
 		    field.setAccessible(true); // You might want to set modifier to public first.

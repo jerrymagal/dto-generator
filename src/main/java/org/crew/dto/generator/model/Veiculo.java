@@ -1,9 +1,7 @@
 package org.crew.dto.generator.model;
 
-import org.crew.dto.generator.annotation.DTOClass;
 import org.crew.dto.generator.annotation.DTOPropertyModel;
 
-@DTOClass(name = "veiculo")
 public class Veiculo {
 
 	private Long id;
