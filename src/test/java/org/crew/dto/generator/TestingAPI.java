@@ -1,7 +1,9 @@
 package org.crew.dto.generator;
 
+import org.crew.dto.generator.dto.VeiculoDTO;
 import org.crew.dto.generator.model.Cliente;
 import org.crew.dto.generator.model.Veiculo;
+import org.crew.dto.generator.reflection.ReflectUtil;
 
 public class TestingAPI {
 	
@@ -21,8 +23,12 @@ public class TestingAPI {
 		veiculo.setModelo("M1CREW");
 		veiculo.setPlaca("CREW1234");
 		
-		System.out.println(veiculo.getCliente().getNome());;
+		System.out.println(veiculo.getCliente().getNome());
 		
+		VeiculoDTO dto = new VeiculoDTO();
+		ReflectUtil.buildDTO(veiculo, dto);
+		
+		System.out.println("Result " + dto.getCliente());
 	}
 
 }

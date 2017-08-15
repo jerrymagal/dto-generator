@@ -1,10 +1,10 @@
-package org.crew.dto.generator.model;
+package org.crew.dto.generator.dto;
 
 import org.crew.dto.generator.annotation.DTO;
 import org.crew.dto.generator.annotation.DTOProperty;
 
 @DTO(name = "veiculo")
-public class Veiculo {
+public class VeiculoDTO {
 
 	private Long id;
 
@@ -12,9 +12,9 @@ public class Veiculo {
 	private String cor;
 	private String modelo;
 	private String fabricante;
-
-	@DTOProperty(name = "cliente", type= String.class, property = "nome")
-	private Cliente cliente;
+	
+	@DTOProperty(name = "cliente", type= String.class, property = "cliente")
+	private String cliente;
 
 	public Long getId() {
 		return id;
@@ -56,11 +56,11 @@ public class Veiculo {
 		this.fabricante = fabricante;
 	}
 
-	public Cliente getCliente() {
+	public String getCliente() {
 		return cliente;
 	}
 
-	public void setCliente(Cliente cliente) {
+	public void setCliente(String cliente) {
 		this.cliente = cliente;
 	}
 
@@ -80,7 +80,7 @@ public class Veiculo {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Veiculo other = (Veiculo) obj;
+		VeiculoDTO other = (VeiculoDTO) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
