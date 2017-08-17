@@ -1,28 +1,34 @@
 package org.crew.dto.generator;
 
-import org.crew.dto.generator.model.Cliente;
-import org.crew.dto.generator.model.Veiculo;
+import org.crew.dto.generator.dto.VeiculoDTO;
+import org.crew.dto.generator.reflection.ReflectUtil;
+import org.crew.dto.generator.service.Service;
+import org.crew.dto.generator.service.ServiceFactory;
+import org.crew.dto.generator.service.VeiculoService;
 
 public class TestingAPI {
 	
 	public static void main(String[] args) {
 		
-		Cliente cliente = new Cliente();
-		cliente.setId(1L);
-		cliente.setCelular("9999-9999");
-		cliente.setEmail("teste@teste.com");
-		cliente.setNome("Danyllo");
-		cliente.setTelefoneFixo("2222-9999");
+		//VeiculoService service = new VeiculoService();
 		
-		Veiculo veiculo = new Veiculo();
-		veiculo.setCliente(cliente);
-		veiculo.setCor("Black");
-		veiculo.setFabricante("CREW");
-		veiculo.setModelo("M1CREW");
-		veiculo.setPlaca("CREW1234");
+		//Service service = ServiceFactory.getService(new VeiculoService());
+		Service service = ServiceFactory.getService(VeiculoService.class);
+		VeiculoDTO veiculo = service.recuperar();
 		
-		System.out.println(veiculo.getCliente().getNome());;
+		System.out.println("========DTO INICIO=======");
 		
+		VeiculoDTO dto = new VeiculoDTO();
+
+		System.out.println("Before " + dto.getCliente());
+		System.out.println("Before " + dto.getMotor());
+		
+		System.out.println("=======DTO FINAL========");
+		
+		ReflectUtil.buildDTO(veiculo, dto);
+		
+		System.out.println("Result " + dto.getCliente());
+		System.out.println("Result " + dto.getMotor());
 	}
 
 }

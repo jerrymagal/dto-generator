@@ -1,21 +1,22 @@
-package org.crew.dto.generator.model;
+package org.crew.dto.generator.dto;
 
-import org.crew.dto.generator.annotation.DTOPropertyModel;
+import org.crew.dto.generator.annotation.DTOPropertyTarget;
 
-public class Veiculo {
+public class VeiculoDTO extends DTO {
 
 	private Long id;
+
 	private String placa;
 	private String cor;
 	private String modelo;
 	private String fabricante;
-
-	@DTOPropertyModel(name = "cliente", property = "nome")
-	private Cliente cliente;
 	
-	@DTOPropertyModel(name = "motor", property = "nome")
-	private Motor motor;
+	@DTOPropertyTarget
+	private String cliente;
 
+	@DTOPropertyTarget
+	private String motor;
+	
 	public Long getId() {
 		return id;
 	}
@@ -56,19 +57,19 @@ public class Veiculo {
 		this.fabricante = fabricante;
 	}
 
-	public Cliente getCliente() {
+	public String getCliente() {
 		return cliente;
 	}
 
-	public void setCliente(Cliente cliente) {
+	public void setCliente(String cliente) {
 		this.cliente = cliente;
 	}
 
-	public Motor getMotor() {
+	public String getMotor() {
 		return motor;
 	}
 
-	public void setMotor(Motor motor) {
+	public void setMotor(String motor) {
 		this.motor = motor;
 	}
 
@@ -88,7 +89,7 @@ public class Veiculo {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Veiculo other = (Veiculo) obj;
+		VeiculoDTO other = (VeiculoDTO) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

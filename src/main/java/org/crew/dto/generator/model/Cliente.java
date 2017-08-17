@@ -1,8 +1,8 @@
 package org.crew.dto.generator.model;
 
 public class Cliente {
+	
 	private Long id;
-
 	private String nome;
 	private String celular;
 	private String telefoneFixo;
