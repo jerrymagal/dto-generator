@@ -1,10 +1,16 @@
 package org.crew.dto.generator.model;
 
+import org.crew.dto.generator.annotation.DTO;
+import org.crew.dto.generator.annotation.DtoProperty;
+
+@DTO(packageName="org.crew.dto.generator.dto")
 public class Cliente {
 	private Long id;
 
+	@DtoProperty
 	private String nome;
 	private String celular;
+	@DtoProperty
 	private String telefoneFixo;
 	private String email;
 
