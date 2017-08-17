@@ -2,7 +2,7 @@ package org.crew.dto.generator.dto;
 
 import org.crew.dto.generator.annotation.DTOPropertyTarget;
 
-public class VeiculoDTO {
+public class VeiculoDTO extends DTO {
 
 	private Long id;
 
@@ -14,6 +14,9 @@ public class VeiculoDTO {
 	@DTOPropertyTarget
 	private String cliente;
 
+	@DTOPropertyTarget
+	private String motor;
+	
 	public Long getId() {
 		return id;
 	}
@@ -60,6 +63,14 @@ public class VeiculoDTO {
 
 	public void setCliente(String cliente) {
 		this.cliente = cliente;
+	}
+
+	public String getMotor() {
+		return motor;
+	}
+
+	public void setMotor(String motor) {
+		this.motor = motor;
 	}
 
 	@Override

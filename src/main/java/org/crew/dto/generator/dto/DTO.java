@@ -7,8 +7,12 @@ import java.util.Map;
 import org.crew.dto.generator.annotation.DTOPropertyModel;
 import org.crew.dto.generator.annotation.DTOPropertyTarget;
 
-public abstract class DTO {
+public class DTO {
 
+	public DTO() {
+		//System.out.println("construtor");
+	}
+	
 	public DTO(Object model) {
 		/*Map<String, Field> montaMapaCamposAnotados = montaMapaCamposAnotados(model.getClass());
 		
@@ -46,7 +50,6 @@ public abstract class DTO {
 			
 			if (fieldDTO != null) {
 				Field fieldModel = mapaModel.get(property);
-
 				setField(model, dto, fieldDTO, fieldModel);
 			}
 		}
@@ -76,8 +79,10 @@ public abstract class DTO {
 
 			try {
 				Object valor = fieldModel.get(model);
-				Object finalValue = getValueAtribute(valor, attModel.property());
-				fieldDTO.set(dto, finalValue);
+				if(valor != null) {
+					Object finalValue = getValueAtribute(valor, attModel.property());
+					fieldDTO.set(dto, finalValue);
+				}
 			} 
 			catch (IllegalArgumentException e) {
 				e.printStackTrace();
@@ -99,14 +104,6 @@ public abstract class DTO {
 		}
 		
 		return null;
-	}
-
-	public static <T> T convertInstanceOfObject(Object o, Class<T> clazz) {
-	    try {
-	        return clazz.cast(o);
-	    } catch(ClassCastException e) {
-	        return null;
-	    }
 	}
 	
 	protected void setAttributesOnParent(Object clazz, Object dto) {

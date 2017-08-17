@@ -5,7 +5,6 @@ import org.crew.dto.generator.annotation.DTOPropertyModel;
 public class Veiculo {
 
 	private Long id;
-
 	private String placa;
 	private String cor;
 	private String modelo;
@@ -13,6 +12,9 @@ public class Veiculo {
 
 	@DTOPropertyModel(name = "cliente", property = "nome")
 	private Cliente cliente;
+	
+	@DTOPropertyModel(name = "motor", property = "nome")
+	private Motor motor;
 
 	public Long getId() {
 		return id;
@@ -60,6 +62,14 @@ public class Veiculo {
 
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
+	}
+
+	public Motor getMotor() {
+		return motor;
+	}
+
+	public void setMotor(Motor motor) {
+		this.motor = motor;
 	}
 
 	@Override

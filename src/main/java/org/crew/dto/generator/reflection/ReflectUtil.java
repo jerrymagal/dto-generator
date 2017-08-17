@@ -93,8 +93,12 @@ public abstract class ReflectUtil {
 
 			try {
 				Object valor = fieldModel.get(model);
-				Object finalValue = getValueAtribute(valor, attModel.property());
-				fieldDTO.set(dto, finalValue);
+				
+				if(valor != null) {
+					Object finalValue = getValueAtribute(valor, attModel.property());
+					fieldDTO.set(dto, finalValue);
+				}
+				
 			} 
 			catch (IllegalArgumentException e) {
 				e.printStackTrace();
