@@ -1,9 +1,9 @@
-package org.crew.dto.generator.model;
+package org.crow.dtogenerator.model;
 
-import org.crew.dto.generator.annotation.DTO;
-import org.crew.dto.generator.annotation.DtoProperty;
+import org.crow.dtogenerator.annotation.DTO;
+import org.crow.dtogenerator.annotation.DtoProperty;
 
-@DTO(packageName="org.crew.dto.generator.dto")
+@DTO(packageName="org.crow.dtogenerator.model.dto", toRebuild=false)
 public class Cliente {
 	private Long id;
 
@@ -13,6 +13,9 @@ public class Cliente {
 	@DtoProperty
 	private String telefoneFixo;
 	private String email;
+	
+	@DtoProperty(type=String.class)
+	private Veiculo veiculo;
 
 	public Long getId() {
 		return id;
@@ -52,6 +55,14 @@ public class Cliente {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public Veiculo getVeiculo() {
+		return veiculo;
+	}
+
+	public void setVeiculo(Veiculo veiculo) {
+		this.veiculo = veiculo;
 	}
 
 	@Override

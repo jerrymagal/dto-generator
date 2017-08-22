@@ -1,4 +1,4 @@
-package org.crew.dto.generator.model;
+package org.crow.dtogenerator.model;
 
 public class Veiculo {
 

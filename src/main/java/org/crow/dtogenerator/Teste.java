@@ -1,4 +1,4 @@
-package org.crew.dto.generator;
+package org.crow.dtogenerator;
 
 import java.io.File;
 import java.io.IOException;
