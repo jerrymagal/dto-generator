@@ -1,21 +1,16 @@
 package org.crow.dtogenerator.scanner;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.crow.dtogenerator.annotation.DTO;
 import org.crow.dtogenerator.annotation.DtoProperty;
 import org.crow.dtogenerator.model.Property;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.crow.dtogenerator.scanner.util.Decompiler;
+import org.crow.dtogenerator.scanner.util.ScannerFile;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -23,88 +18,64 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.Modifier;
-import jd.common.loader.DirectoryLoader;
-import jd.common.preferences.CommonPreferences;
-import jd.common.printer.text.PlainTextPrinter;
-import jd.core.loader.LoaderException;
-import jd.core.process.DecompilerImpl;
+import net.sf.corn.cps.CPScanner;
+import net.sf.corn.cps.ClassFilter;
+import net.sf.corn.cps.PackageNameFilter;
 
 public class ScannerDTOAnnotation {
 	
-	private static final String CLASS = ".class";
-	private static final String JAVA = ".java";
-
-	private String dtoName;
-	private DTO dtoAnnotation;
-	private String deployDir;
-	private String dtoClassName;
-	private String dtoJavaName;
-	private String packageName;
+	private static final Logger LOGGER = Logger.getLogger(ScannerDTOAnnotation.class);
 	
-	public static void main(String[] args) {
-		new ScannerDTOAnnotation().findAnnotatedClasses("org.crow.dtogenerator");
-	}
-
-	public void findAnnotatedClasses(String packageName) {
-		ClassPathScanningCandidateComponentProvider provider = createComponentScanner();
+	private Scanner scanner;
+	
+	public void execute(String deployDir, String packageClass) {
 		
-		for(BeanDefinition definition : provider.findCandidateComponents(packageName)) {
-			createDtoClass(definition);
+		this.scanner = new Scanner(deployDir);
+		
+		LOGGER.info("Init DTO Scanner");
+		
+		List<Class<?>> scanClasses = CPScanner.scanClasses(new PackageNameFilter(packageClass),
+							  new ClassFilter().appendAnnotation(DTO.class));
+		
+		if(scanClasses == null || scanClasses.isEmpty()) {
+			LOGGER.info("DTO Annotation Not Found");
+			return;
+		}
+		
+		for (Class<?> classe : scanClasses) {
+			this.scanner.setDtoAnnotation(classe.getAnnotation(DTO.class));
+			createDtoClass(classe);
 		}
 	}
 
-	private ClassPathScanningCandidateComponentProvider createComponentScanner() {
-		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
-		provider.addIncludeFilter(new AnnotationTypeFilter(DTO.class));
-		return provider;
-	}
-
-	private void createDtoClass(BeanDefinition definition) {
+	private void createDtoClass(Class<?> classe) {
 		
-			Class<?> classe = null;
-			
-			try {
-				classe = Class.forName(definition.getBeanClassName());
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-			
-			this.dtoAnnotation = classe.getAnnotation(DTO.class);
-			
-			packageName = getPackage(classe);
-			initProperties(classe.getSimpleName());
-			
-			if(!dtoAnnotation.toRebuild() && existsFile()) {
-				return;
-			}
+		initScannerProperties(classe);
+		boolean stopScan = !this.scanner.getDtoAnnotation().toRebuild() && ScannerFile.existsFile(this.scanner);
+		
+		if(stopScan) {
+			return;
+		}
 
-			File file = new File(deployDir);
-			buildClass(file, classe);
-			decompilerClass(file);
-			addPackage(file);
+		File file = new File(this.scanner.getPackageDeploy());
+		buildClass(file, classe);
+		Decompiler.decompile(file, this.scanner);
+		ScannerFile.addPackage(file, this.scanner);
 	}
 	
-	private void initProperties(String className) {
-		final String property = System.getProperty("user.dir");
-		final String source = "src\\main\\java";
-		this.deployDir = property+"\\"+source+"\\"+packageName.replace(".", "\\");
-		this.dtoName = className + "DTO";
-		this.dtoClassName = dtoName + CLASS;
-		this.dtoJavaName = dtoName + JAVA;
+	private void initScannerProperties(Class<?> classe) {
+		this.scanner.setDtoName(classe.getSimpleName());
+		this.scanner.setPackageName(getPackage(classe));
 	}
 
-	private boolean existsFile() {
-		File file = FileUtils.getFile(this.deployDir + "\\" + dtoJavaName);
-		return file.exists();
-	}
-	
 	private void buildClass(File file, Class<?> classe) {
 		
 		ClassPool dtoClassGenerator = ClassPool.getDefault();
 		
-		CtClass dtoClass = dtoClassGenerator.makeClass(dtoName);
+		CtClass dtoClass = dtoClassGenerator.makeClass(this.scanner.getDtoName());
 		
 		try {
+			
 			for(Field field : classe.getDeclaredFields()) {
 				
 				DtoProperty annotation = field.getAnnotation(DtoProperty.class);
@@ -131,46 +102,19 @@ public class ScannerDTOAnnotation {
 					CtMethod setter = CtNewMethod.setter("set" + StringUtils.capitalize(field.getName()), dtoField);
 					dtoClass.addMethod(setter);
 				}
+				
 			}
 			
 			dtoClass.writeFile(file.getAbsolutePath());
+			LOGGER.info("Write DTO File in" + file.getAbsolutePath());
 			
 		} catch (Exception e) {
 			System.out.println(e);
 		}
 	}
-	
-	private void decompilerClass(File file) {
-		DirectoryLoader loader;
-		try {
-			DecompilerImpl decompilerImpl = new DecompilerImpl();
-			CommonPreferences commonPreferences = new CommonPreferences();
-			loader = new DirectoryLoader(file);
-			PrintStream printStream = new PrintStream(deployDir + "\\" + dtoJavaName);
-			PlainTextPrinter plainTextPrinter = new PlainTextPrinter(commonPreferences, printStream);
-			
-			decompilerImpl.decompile(commonPreferences, loader, plainTextPrinter, dtoClassName);
-		} catch (LoaderException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void addPackage(File file) {
-		try {
-			FileUtils.getFile(file, dtoClassName).delete();
-			File javaFile = FileUtils.getFile(file, dtoJavaName);
-			List<String> readLines = FileUtils.readLines(javaFile, Charset.defaultCharset());
-			readLines.add(0, "package " + packageName + "\n");
-			FileUtils.writeLines(javaFile, readLines);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 	private String getPackage(Class<?> classe) {
-		String packageDto = dtoAnnotation.packageName();
+		String packageDto = scanner.getDtoAnnotation().packageName();
 		return packageDto.isEmpty() ? classe.getPackage().getName() : packageDto;
 	}
 }
